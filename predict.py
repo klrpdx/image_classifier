@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import torch
 import json
 
+
 def main():
     args = get_args()
     with open(args.category_name_map) as file:
@@ -15,13 +16,15 @@ def main():
     
     values, classes = predict(args.path_to_image, model, args.top_k, args.use_gpu)
     __make_prediction(values,classes,category_name_map)
-    
+
+
 def __make_prediction(values, classes, cat_to_name):
     print("Top {} probabilities:".format(len(values)))
     for i, value in enumerate(values):    
         flower = cat_to_name[str(classes[i])]
         print("{:.1f}% {}".format(value*100,flower))
-    
+
+
 def __load_model(filepath):
     checkpoint = torch.load(filepath)
     arch = checkpoint['arch']
@@ -31,6 +34,7 @@ def __load_model(filepath):
     model.class_to_idx = checkpoint['class_to_idx']
     model.eval()
     return model
+
 
 def predict(image_path, model, topk, gpu):
     cuda_or_cpu = 'cpu'
@@ -50,7 +54,8 @@ def predict(image_path, model, topk, gpu):
         classes.append(index_to_class[inx.tolist()])
 
     return values[0].tolist(), classes
-    
+
+
 def process_image(image, crop=True):
     im = Image.open(image)
     dims = (256,256)

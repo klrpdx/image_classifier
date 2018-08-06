@@ -10,15 +10,13 @@ import os
 def do_deep_learning(pretrained_model, data_dir, learning_rate, hidden_units, epochs, cuda=True):
     train_loader, valid_loader, test_loader, class_to_idx = __setup_data(data_dir)
 
-    train_dir = data_dir+'/train/'
+    train_dir = data_dir + '/train/'
     number_of_classes = len(os.listdir(train_dir))
     number_of_inputs = pretrained_model.classifier[0].in_features
 
     for param in pretrained_model.parameters():
         param.requires_grad = False
 
-
-    
     classifier = __build_classifer(number_of_inputs, number_of_classes, hidden_units)
     pretrained_model.classifier = classifier
 
@@ -33,7 +31,6 @@ def do_deep_learning(pretrained_model, data_dir, learning_rate, hidden_units, ep
 
 
 def __learn(pretrained_model, train_loader, validation_loader, epochs, criterion, optimizer, cuda):
-   
     steps = 0
     print_every = 40
     cpu_or_cuda = 'cpu'
@@ -59,8 +56,8 @@ def __learn(pretrained_model, train_loader, validation_loader, epochs, criterion
             running_loss += loss.item()
 
             if steps % print_every == 0:
-                print("Epoch: {}/{}... ".format(e + 1, epochs), 
-                    "Running Training Loss: {:.4f}".format(running_loss / print_every))
+                print("Epoch: {}/{}... ".format(e + 1, epochs),
+                      "Running Training Loss: {:.4f}".format(running_loss / print_every))
                 running_loss = 0
 
         count = 0
@@ -70,10 +67,10 @@ def __learn(pretrained_model, train_loader, validation_loader, epochs, criterion
             valid_inputs, valid_labels = valid_inputs.to(cpu_or_cuda), valid_labels.to(cpu_or_cuda)
             valid_outputs = pretrained_model(valid_inputs)
             valid_loss += criterion(valid_outputs, valid_labels)
-                    
-        print("Epoch {} Validation Loss: {:.4f}".format(e+1, valid_loss/count))
+
+        print("Epoch {} Validation Loss: {:.4f}".format(e + 1, valid_loss / count))
         valid_accuracy = check_accuracy(validation_loader, pretrained_model, cpu_or_cuda)
-        print("Epoch {} Validation Accuracy: {:.4f}%".format(e+1, 100*valid_accuracy))
+        print("Epoch {} Validation Accuracy: {:.4f}%".format(e + 1, 100 * valid_accuracy))
 
     return pretrained_model
 
@@ -93,7 +90,6 @@ def check_accuracy(loader, model, cpu_or_cuda):
 
 
 def __build_classifer(input_count, number_of_classes, hidden_units):
-  
     classifier = nn.Sequential(
         nn.Linear(input_count, hidden_units),
         nn.ReLU(),
@@ -143,4 +139,3 @@ def __setup_data(data_dir):
     test_loader = DataLoader(test_data, batch_size=32, shuffle=True)
 
     return train_loader, validation_loader, test_loader, train_data.class_to_idx
-
