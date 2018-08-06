@@ -12,7 +12,7 @@ def main():
     with open(args.category_name_map) as file:
         category_name_map = json.load(file)
         
-    model = __load_model(args.checkpoint)
+    model = __load_model(args.checkpoint, args.use_gpu)
     
     values, classes = predict(args.path_to_image, model, args.top_k, args.use_gpu)
     __make_prediction(values,classes,category_name_map)
@@ -25,8 +25,10 @@ def __make_prediction(values, classes, cat_to_name):
         print("{:.1f}% {}".format(value*100,flower))
 
 
-def __load_model(filepath):
-    checkpoint = torch.load(filepath)
+def __load_model(filepath, gpu):
+
+    checkpoint = torch.load(filepath) if gpu else torch.load(filepath, map_location='cpu')
+
     arch = checkpoint['arch']
     model = getattr(models, arch)(pretrained=True)
     model.classifier = checkpoint['classifier']
